@@ -52,11 +52,29 @@ TEST_CASE("one, contains all", ""){
     REQUIRE(output.str() == "3 \n");
 }
 
-TEST_CASE("one, contains none", ""){
+TEST_CASE("one, contains none, in the middle", ""){
     std::stringstream input, output;
     input<<"3 1\n"
            "1 4 5\n"
            "2 3";
+    parseFile(input,output);
+    REQUIRE(output.str() == "0 \n");
+}
+
+TEST_CASE("one, contains none, larger", ""){
+    std::stringstream input, output;
+    input<<"3 1\n"
+           "1 4 5\n"
+           "6 7";
+    parseFile(input,output);
+    REQUIRE(output.str() == "0 \n");
+}
+
+TEST_CASE("one, contains none, smaller", ""){
+    std::stringstream input, output;
+    input<<"3 1\n"
+           "1 4 5\n"
+           "-1 0";
     parseFile(input,output);
     REQUIRE(output.str() == "0 \n");
 }
