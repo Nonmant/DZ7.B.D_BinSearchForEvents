@@ -9,23 +9,14 @@ enum EventType : short int{
     LineEnd = 2
 };
 
-struct Line{
-    int left, right, kittens = 0;
-    Line(int left, int right):
-        left(left),right(right){}
-};
-
 void parseInput(std::istream & input,
                  std::vector<std::tuple<int, EventType, int> > & events,
-                 std::vector<Line> & lines,
                  int & kittensN, int & linesM){
     events.clear();
-    lines.clear();
 
     input>>kittensN>>linesM;
 
     events.reserve(kittensN+2*linesM);
-    lines.reserve(linesM);
 
     int pos;
     for(int i = 0; i<kittensN; ++i){
@@ -37,40 +28,37 @@ void parseInput(std::istream & input,
         input >> left >> right;
         events.emplace_back(left, LineStart, i);
         events.emplace_back(right, LineEnd, i);
-        lines.emplace_back(left,right);
     }
 }
 
 void parseFile(std::istream & input, std::ostream & output){
     //! position, type, index of line
     std::vector<std::tuple<int, EventType, int> > events;
-    std::vector<Line> lines;
+    std::vector<std::pair<int,int>> lines;
     int kittensN, linesM;
-    parseInput(input,events,lines, kittensN, linesM);
+    parseInput(input,events, kittensN, linesM);
 
     std::sort(events.begin(), events.end());
 
+    std::vector<int> kittensPerLine(linesM);
     std::unordered_set<int> curLines;
     for(auto & event : events){
-        auto [pos, type, lineIndex] = event;
-        switch (type) {
+        switch (std::get<1>(event)) {
             case LineStart:
-                curLines.insert(lineIndex);
+                curLines.insert(std::get<2>(event));
                 break;
             case LineEnd:
-                curLines.erase(lineIndex);
+                curLines.erase(std::get<2>(event));
                 break;
             case Kitten:
                 for(auto i : curLines){
-                    ++lines[i].kittens;
+                    ++kittensPerLine[i];
                 }
                 break;
         }
     }
 
     //output
-    for(auto & line : lines){
-        output << line.kittens << ' ';
-    }
+    std::copy(kittensPerLine.begin(), kittensPerLine.end(), std::ostream_iterator<int>(output, " "));
     output << std::endl;
 }
