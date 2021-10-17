@@ -29,6 +29,20 @@ TEST_CASE("test 1, file", "[simple]"){
     REQUIRE(buffer.str() == "1 \n");
 }
 
+TEST_CASE("file 013", ""){
+    BENCHMARK("Largest file"){
+        std::ifstream input( "../013", std::ofstream::in);
+        std::stringstream output;
+        parseFile(input,output);
+        input.close();
+
+        std::ifstream answer("../013.a", std::ofstream::in);
+        std::string answerStr(std::istreambuf_iterator<char>{answer}, {});
+        answer.close();
+        REQUIRE(output.str() == answerStr);
+    };
+}
+
 TEST_CASE("one, contains all", ""){
     std::stringstream input, output;
     input<<"3 1\n"
